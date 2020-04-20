@@ -11,7 +11,7 @@ func ExampleNewtonBCGS() {
 	// This example shows how one can use NewtonBCGS to solve the
 	// system of equations
 	// (x-1)^2*(x - y) = 0
-	// (x-2)^2*cos(2*x/y) = 0
+	// (x-2)^3*cos(2*x/y) = 0
 
 	problem := nonlin.Problem{
 		F: func(out, x []float64) {

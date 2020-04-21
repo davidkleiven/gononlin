@@ -24,13 +24,17 @@ type NewtonBCGS struct {
 
 	// Maximum number of iterations
 	Maxiter int
+
+	// Number of points used to approximate the jacobian. If not given (or set to zero)
+	// a four point stencil will be used
+	Stencil int
 }
 
-func (bcgs *NewtonBCGS) solveDX(p Problem, x []float64, f0 []float64) []float64 {
+func (bcgs *NewtonBCGS) solveDX(p Problem, x []float64, f0 []float64, deriv DerivativeApprox) []float64 {
 	work := make([]float64, 8*len(x))
 	dx := work[:len(x)]
 	r := work[len(x) : 2*len(x)]
-	xn := work[2*len(x) : 3*len(x)]
+	//xn := work[2*len(x) : 3*len(x)]
 	f1 := work[3*len(x) : 4*len(x)]
 	g := work[4*len(x) : 5*len(x)]
 	r0 := work[5*len(x) : 6*len(x)]
@@ -56,14 +60,15 @@ func (bcgs *NewtonBCGS) solveDX(p Problem, x []float64, f0 []float64) []float64 
 			pVec[i] = r[i] + beta*(pVec[i]-omega*g[i])
 		}
 
-		eps := bcgs.StepSize
-		for i := range xn {
-			xn[i] = x[i] + eps*pVec[i]
-		}
-		p.F(f1, xn)
-		for i := range g {
-			g[i] = (f1[i] - f0[i]) / eps
-		}
+		//eps := bcgs.StepSize
+		// for i := range xn {
+		// 	xn[i] = x[i] + eps*pVec[i]
+		// }
+		// p.F(f1, xn)
+		// for i := range g {
+		// 	g[i] = (f1[i] - f0[i]) / eps
+		// }
+		deriv.Eval(x, pVec, g)
 
 		alpha = 0.0
 		for i := range g {
@@ -84,14 +89,16 @@ func (bcgs *NewtonBCGS) solveDX(p Problem, x []float64, f0 []float64) []float64 
 			s[i] = r[i] - alpha*g[i]
 		}
 
-		for i := range xn {
-			xn[i] = x[i] + eps*s[i]
-		}
-		p.F(f1, xn)
-		t := f1 // Overwrite t into f1, they are not needed simultaneously
-		for i := range t {
-			t[i] = (f1[i] - f0[i]) / eps
-		}
+		t := f1
+		// for i := range xn {
+		// 	xn[i] = x[i] + eps*s[i]
+		// }
+		// p.F(f1, xn)
+		// t := f1 // Overwrite t into f1, they are not needed simultaneously
+		// for i := range t {
+		// 	t[i] = (f1[i] - f0[i]) / eps
+		// }
+		deriv.Eval(x, s, t)
 
 		tDots := 0.0
 		tDott := 0.0
@@ -123,13 +130,27 @@ func (bcgs *NewtonBCGS) solveDX(p Problem, x []float64, f0 []float64) []float64 
 // the inifinity norm of F + the inifinity norm of dx is less than the tolerance.
 // dx is the change in x between two sucessive iterations.
 func (bcgs *NewtonBCGS) Solve(p Problem, x []float64) Result {
+	var deriv DerivativeApprox
+	switch bcgs.Stencil {
+	case 0, 4:
+		deriv = NewFourPoint(p.F, bcgs.StepSize)
+	case 2:
+		deriv = NewCentral(p.F, bcgs.StepSize)
+	case 6:
+		deriv = NewSixPoint(p.F, bcgs.StepSize)
+	case 8:
+		deriv = NewEightPoint(p.F, bcgs.StepSize)
+	default:
+		deriv = NewFourPoint(p.F, bcgs.StepSize)
+	}
+
 	work := make([]float64, 2*len(x))
 	f0 := work[:len(x)]
 	f1 := work[len(x):]
 
 	for iter := 0; iter < bcgs.Maxiter; iter++ {
 		p.F(f0, x)
-		dx := bcgs.solveDX(p, x, f0)
+		dx := bcgs.solveDX(p, x, f0, deriv)
 
 		if InfNorm(f0)+InfNorm(dx) < bcgs.Tol {
 			return Result{

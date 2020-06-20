@@ -12,3 +12,12 @@ func InfNorm(x []float64) float64 {
 	}
 	return value
 }
+
+// L2Norm calculates the L2Norm of a vector
+func L2Norm(x []float64) float64 {
+	value := 0.0
+	for i := range x {
+		value += x[i] * x[i]
+	}
+	return value
+}

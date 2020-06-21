@@ -7,8 +7,8 @@ import (
 	"github.com/davidkleiven/gononlin/nonlin"
 )
 
-func ExampleNewtonBCGS() {
-	// This example shows how one can use NewtonBCGS to solve the
+func ExampleNewtonKrylov() {
+	// This example shows how one can use NewtonKrylov to solve the
 	// system of equations
 	// (x-1)^2*(x - y) = 0
 	// (x-2)^3*cos(2*x/y) = 0
@@ -20,7 +20,7 @@ func ExampleNewtonBCGS() {
 		},
 	}
 
-	solver := nonlin.NewtonBCGS{
+	solver := nonlin.NewtonKrylov{
 		// Maximum number of Newton iterations
 		Maxiter: 1000,
 

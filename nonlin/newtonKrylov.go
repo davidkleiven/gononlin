@@ -8,7 +8,7 @@ import (
 	"gonum.org/v1/gonum/mat"
 )
 
-// NewtonBCGS solve a non-linear system of equation using the conjugate gradient
+// NewtonKrylov solve a non-linear system of equation using the conjugate gradient
 // Jacobian Free Newton Krylov method. It is Newton based method, but the Jacobian
 // is never explicitly constructed, since we only needs its action onto a vector
 // (e.g. Jv, where J is the jacobian matrix and v is a vector). This, makes the
@@ -19,7 +19,7 @@ import (
 // one seeks the folusion F(x) = 0. The method will try at most Maxiter Newton steps
 // before it terminates. In case, the maximum number of iterations is reached the Converged
 // attribute of the Result struct will be false.
-type NewtonBCGS struct {
+type NewtonKrylov struct {
 	// Tolerance for convergence. The method terminates when InfNorm(F(x)) + InfNorm(dx)
 	// is less than this value. Here, dx represents the amound the position changed on the
 	// current Newton step
@@ -44,28 +44,28 @@ type NewtonBCGS struct {
 // Solve solves the non-linear system of equations. The method terminates when
 // the inifinity norm of F + the inifinity norm of dx is less than the tolerance.
 // dx is the change in x between two sucessive iterations.
-func (bcgs *NewtonBCGS) Solve(p Problem, x []float64) Result {
+func (nk *NewtonKrylov) Solve(p Problem, x []float64) Result {
 	var deriv DerivativeApprox
-	switch bcgs.Stencil {
+	switch nk.Stencil {
 	case 0, 4:
-		deriv = NewFourPoint(p.F, bcgs.StepSize)
+		deriv = NewFourPoint(p.F, nk.StepSize)
 	case 2:
-		deriv = NewCentral(p.F, bcgs.StepSize)
+		deriv = NewCentral(p.F, nk.StepSize)
 	case 6:
-		deriv = NewSixPoint(p.F, bcgs.StepSize)
+		deriv = NewSixPoint(p.F, nk.StepSize)
 	case 8:
-		deriv = NewEightPoint(p.F, bcgs.StepSize)
+		deriv = NewEightPoint(p.F, nk.StepSize)
 	default:
-		deriv = NewFourPoint(p.F, bcgs.StepSize)
+		deriv = NewFourPoint(p.F, nk.StepSize)
 	}
 	deriv.X = x
 
-	if bcgs.InnerMethod == nil {
-		bcgs.InnerMethod = &linsolve.GMRES{}
+	if nk.InnerMethod == nil {
+		nk.InnerMethod = &linsolve.GMRES{}
 	}
 
-	if bcgs.Maxiter == 0 {
-		bcgs.Maxiter = 10000
+	if nk.Maxiter == 0 {
+		nk.Maxiter = 10000
 	}
 
 	work := make([]float64, 2*len(x))
@@ -73,19 +73,19 @@ func (bcgs *NewtonBCGS) Solve(p Problem, x []float64) Result {
 	f1 := work[len(x):]
 	b := mat.NewVecDense(len(f0), nil)
 
-	for iter := 0; iter < bcgs.Maxiter; iter++ {
+	for iter := 0; iter < nk.Maxiter; iter++ {
 		p.F(f0, x)
 		for i := range f0 {
 			b.SetVec(i, -f0[i])
 		}
-		res, err := linsolve.Iterative(&deriv, b, bcgs.InnerMethod, nil)
+		res, err := linsolve.Iterative(&deriv, b, nk.InnerMethod, nil)
 		if err != nil {
 			log.Fatalf("NewtonKrylov: %s\n", err)
 		}
 
-		//dx := bcgs.solveDX(p, x, f0, deriv)
+		//dx := nk.solveDX(p, x, f0, deriv)
 
-		if InfNorm(f0)+mat.Norm(res.X, math.Inf(1)) < bcgs.Tol {
+		if InfNorm(f0)+mat.Norm(res.X, math.Inf(1)) < nk.Tol {
 			return Result{
 				X:         x,
 				Converged: true,

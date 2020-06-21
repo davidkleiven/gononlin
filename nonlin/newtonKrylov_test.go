@@ -60,7 +60,7 @@ func TestBicStab(t *testing.T) {
 			Tol:      1e-4,
 		},
 	} {
-		solver := NewtonBCGS{
+		solver := NewtonKrylov{
 			Maxiter:  1000,
 			StepSize: 1e-3,
 			Tol:      1e-7,

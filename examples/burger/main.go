@@ -1,4 +1,4 @@
-// main shows how one can use NewtonBCGS to solve the Burgers equation using
+// main shows how one can use NewtonKrylov to solve the Burgers equation using
 // implicit euler method
 package main
 
@@ -41,7 +41,7 @@ func main() {
 		},
 	}
 
-	solver := nonlin.NewtonBCGS{
+	solver := nonlin.NewtonKrylov{
 		Tol:      1e-7,
 		StepSize: 1e-3,
 		Maxiter:  10000,

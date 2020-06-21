@@ -39,5 +39,5 @@ func ExampleNewtonBCGS() {
 	// Output:
 	//
 	// Root: (x, y) = (1.00, 2.00)
-	// Function value: (-0.00, -0.00)
+	// Function value: (-0.00, 0.00)
 }

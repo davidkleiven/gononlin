@@ -3,6 +3,8 @@ package nonlin
 import (
 	"math"
 	"testing"
+
+	"gonum.org/v1/gonum/mat"
 )
 
 func TestDerivativeApprox(t *testing.T) {
@@ -23,12 +25,13 @@ func TestDerivativeApprox(t *testing.T) {
 		NewSixPoint(f, 1e-3),
 		NewEightPoint(f, 1e-3),
 	} {
-		res := make([]float64, 2)
-		approx.Eval(x, v, res)
+		res := mat.NewVecDense(2, nil)
+		approx.X = x
+		approx.MulVecTo(res, false, mat.NewVecDense(2, v))
 
 		tol := 1e-8
 		for j := range expect {
-			if math.Abs(expect[j]-res[j]) > tol {
+			if math.Abs(expect[j]-res.AtVec(j)) > tol {
 				t.Errorf("Test #%d: Expected\n%v\nGot\n%v\n", i, expect, res)
 				break
 			}

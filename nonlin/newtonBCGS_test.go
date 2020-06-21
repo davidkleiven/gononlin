@@ -19,7 +19,7 @@ func TestBicStab(t *testing.T) {
 			},
 			Init:     []float64{0.0, 3.0},
 			Solution: []float64{1.0, 2.0},
-			Tol:      1e-2,
+			Tol:      5e-2,
 		},
 		{
 			F: func(out []float64, x []float64) {
@@ -28,7 +28,7 @@ func TestBicStab(t *testing.T) {
 			},
 			Init:     []float64{-0.3, -0.5},
 			Solution: []float64{0.0, 0.0},
-			Tol:      1e-2,
+			Tol:      1e-3,
 		},
 		// Rosenbrock function
 		{
@@ -77,15 +77,15 @@ func TestBicStab(t *testing.T) {
 		}
 
 		//fmt.Printf("%v\n", res.X)
+		if math.Abs(res.MaxF) > solver.Tol {
+			t.Errorf("Test #%d: Did find a root. Inf. norm: %e\n", i, res.MaxF)
+		}
+
 		for j := range res.X {
 			if math.Abs(res.X[j]-test.Solution[j]) > test.Tol {
 				t.Errorf("Test #%d:\nExpected\n%v\nGot\n%v\n", i, test.Solution, res.X)
 				break
 			}
-		}
-
-		if math.Abs(res.MaxF) > solver.Tol {
-			t.Errorf("Test #%d: Did find a root. Inf. norm: %e\n", i, res.MaxF)
 		}
 	}
 }

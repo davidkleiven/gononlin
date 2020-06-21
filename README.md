@@ -1,3 +1,5 @@
+![Logo](assets/logo.png)
+
 # GoNonLin
 
 [![Build Status](https://travis-ci.org/davidkleiven/gononlin.svg?branch=master)](https://travis-ci.org/davidkleiven/gononlin)
@@ -51,3 +53,7 @@ func ExampleNewtonKrylov() {
 	// Function value: (-0.00, 0.00)
 }
 ```
+
+# Acknowledgements
+
+* [Gonum](https://github.com/gonum/gonum) is used to solve the linear system of equations arising in the **NewtonKrylov** method

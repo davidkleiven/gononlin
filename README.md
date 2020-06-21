@@ -1,6 +1,4 @@
-![Logo](assets/logo.png)
-
-# GoNonLin
+<img src="assets/logo.svg" width=50%/>
 
 [![Build Status](https://travis-ci.org/davidkleiven/gononlin.svg?branch=master)](https://travis-ci.org/davidkleiven/gononlin)
 

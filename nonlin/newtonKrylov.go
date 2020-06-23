@@ -39,6 +39,11 @@ type NewtonKrylov struct {
 	// InnerMethod is the linear solver used in the "inner" iterations of the NewtonKrylov
 	// method. If not given, GMRES with the default parameters in Gonum will be used
 	InnerMethod linsolve.Method
+
+	// Settings passed to linsolve.Iterative.
+	// See https://godoc.org/github.com/gonum/exp/linsolve#Iterative
+	// for further details
+	InnerSettings *linsolve.Settings
 }
 
 // Solve solves the non-linear system of equations. The method terminates when
@@ -78,12 +83,10 @@ func (nk *NewtonKrylov) Solve(p Problem, x []float64) Result {
 		for i := range f0 {
 			b.SetVec(i, -f0[i])
 		}
-		res, err := linsolve.Iterative(&deriv, b, nk.InnerMethod, nil)
+		res, err := linsolve.Iterative(&deriv, b, nk.InnerMethod, nk.InnerSettings)
 		if err != nil {
 			log.Fatalf("NewtonKrylov: %s\n", err)
 		}
-
-		//dx := nk.solveDX(p, x, f0, deriv)
 
 		if InfNorm(f0)+mat.Norm(res.X, math.Inf(1)) < nk.Tol {
 			return Result{
@@ -95,8 +98,8 @@ func (nk *NewtonKrylov) Solve(p Problem, x []float64) Result {
 		}
 
 		// Update x
-		for i := range deriv.X {
-			deriv.X[i] += res.X.AtVec(i)
+		for i := range x {
+			x[i] += res.X.AtVec(i)
 		}
 
 		p.F(f1, x)
@@ -112,11 +115,11 @@ func (nk *NewtonKrylov) Solve(p Problem, x []float64) Result {
 			lamb = lambMin
 		}
 		for i := range x {
-			deriv.X[i] += (lamb - 1.0) * res.X.AtVec(i) // Subtract 1.0*dx since we already added that before
+			x[i] += (lamb - 1.0) * res.X.AtVec(i) // Subtract 1.0*dx since we already added that before
 		}
 	}
 	return Result{
-		X:         deriv.X,
+		X:         x,
 		Converged: false,
 		MaxF:      InfNorm(f0),
 		F:         f0,

@@ -89,3 +89,51 @@ func TestBicStab(t *testing.T) {
 		}
 	}
 }
+
+func BenchmarkTestBicStab_3Unknowns(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		p := Problem{
+			F: func(out []float64, x []float64) {
+				out[0] = math.Cos(x[0]) - 9.0 + 3.0*x[0] + 8*math.Exp(x[1])
+				out[1] = math.Cos(x[1]) - 9.0 + 3.0*x[1] + 8*math.Exp(x[0])
+				out[2] = math.Cos(x[2]) - x[2] - 1.0
+			},
+		}
+
+		solver := NewtonKrylov{
+			Maxiter:  1000,
+			StepSize: 1e-3,
+			Tol:      1e-7,
+			Stencil:  6,
+		}
+		init := []float64{0.1, 0.35, 2.4}
+		solver.Solve(p, init)
+	}
+}
+
+func BenchmarkTestBicStab_100Unknowns(b *testing.B) {
+	n := 100
+	for i := 0; i < b.N; i++ {
+		p := Problem{
+			F: func(out []float64, x []float64) {
+				for i := range out {
+					out[i] = x[i]*x[i] - 0.01
+				}
+			},
+		}
+
+		solver := NewtonKrylov{
+			Maxiter:  1000,
+			StepSize: 1e-3,
+			Tol:      1e-7,
+			Stencil:  6,
+		}
+
+		init := make([]float64, n)
+		for i := range init {
+			init[i] = 5.0
+		}
+
+		solver.Solve(p, init)
+	}
+}

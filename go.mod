@@ -4,5 +4,5 @@ go 1.13
 
 require (
 	gonum.org/v1/exp v0.0.0-20220503065741-e45430a0816d
-	gonum.org/v1/gonum v0.13.0
+	gonum.org/v1/gonum v0.14.0
 )

@@ -6,6 +6,7 @@ import (
 	"encoding/csv"
 	"flag"
 	"fmt"
+	"log"
 	"math"
 	"os"
 
@@ -51,10 +52,15 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	defer csvfile.Close()
+
 	csvwriter := csv.NewWriter(csvfile)
 	for i := 0; i < *steps; i++ {
 		copy(uCpy, u)
-		res := solver.Solve(problem, u)
+		res, err := solver.Solve(problem, u)
+		if err != nil {
+			log.Fatal(err)
+		}
 		copy(u, res.X)
 
 		row := make([]string, len(u))
@@ -64,5 +70,5 @@ func main() {
 		csvwriter.Write(row)
 	}
 	csvwriter.Flush()
-	csvfile.Close()
+
 }

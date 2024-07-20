@@ -49,7 +49,7 @@ type NewtonKrylov struct {
 // Solve solves the non-linear system of equations. The method terminates when
 // the inifinity norm of F + the inifinity norm of dx is less than the tolerance.
 // dx is the change in x between two sucessive iterations.
-func (nk *NewtonKrylov) Solve(p Problem, x []float64) Result {
+func (nk *NewtonKrylov) Solve(p Problem, x []float64) (Result, error) {
 	var deriv DerivativeApprox
 	switch nk.Stencil {
 	case 0, 4:
@@ -85,7 +85,8 @@ func (nk *NewtonKrylov) Solve(p Problem, x []float64) Result {
 		}
 		res, err := linsolve.Iterative(&deriv, b, nk.InnerMethod, nk.InnerSettings)
 		if err != nil {
-			log.Fatalf("NewtonKrylov: %s\n", err)
+			log.Printf("[ERROR] NewtonKrylov: %s\n", err)
+			return Result{}, err
 		}
 
 		if InfNorm(f0)+mat.Norm(res.X, math.Inf(1)) < nk.Tol {
@@ -94,7 +95,7 @@ func (nk *NewtonKrylov) Solve(p Problem, x []float64) Result {
 				Converged: true,
 				MaxF:      InfNorm(f0),
 				F:         f0,
-			}
+			}, nil
 		}
 
 		// Update x
@@ -123,5 +124,5 @@ func (nk *NewtonKrylov) Solve(p Problem, x []float64) Result {
 		Converged: false,
 		MaxF:      InfNorm(f0),
 		F:         f0,
-	}
+	}, nil
 }

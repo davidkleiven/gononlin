@@ -70,7 +70,10 @@ func TestBicStab(t *testing.T) {
 		p := Problem{
 			F: test.F,
 		}
-		res := solver.Solve(p, test.Init)
+		res, err := solver.Solve(p, test.Init)
+		if err != nil {
+			t.Error(err)
+		}
 
 		if !res.Converged {
 			t.Errorf("Test #%d did not converged", i)

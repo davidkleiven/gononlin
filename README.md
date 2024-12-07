@@ -9,14 +9,17 @@ Jacobian matrix is never explicitly stored, which makes the technique very memor
 # Example
 
 ```go
+package nonlin_test
+
 import (
 	"fmt"
 	"math"
+	"testing"
 
 	"github.com/davidkleiven/gononlin/nonlin"
 )
 
-func ExampleNewtonKrylov() {
+func ExampleNewtonKrylov(t *testing.T) {
 	// This example shows how one can use NewtonKrylov to solve the
 	// system of equations
 	// (x-1)^2*(x - y) = 0
@@ -41,7 +44,10 @@ func ExampleNewtonKrylov() {
 	}
 
 	x0 := []float64{0.0, 3.0}
-	res := solver.Solve(problem, x0)
+	res, err := solver.Solve(problem, x0)
+	if err != nil {
+		t.Error(err)
+	}
 	fmt.Printf("Root: (x, y) = (%.2f, %.2f)\n", res.X[0], res.X[1])
 	fmt.Printf("Function value: (%.2f, %.2f)\n", res.F[0], res.F[1])
 

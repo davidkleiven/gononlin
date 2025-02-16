@@ -48,7 +48,7 @@ type NewtonKrylov struct {
 
 // Solve solves the non-linear system of equations. The method terminates when
 // the inifinity norm of F + the inifinity norm of dx is less than the tolerance.
-// dx is the change in x between two sucessive iterations.
+// dx is the change in x between two successive iterations.
 func (nk *NewtonKrylov) Solve(p Problem, x []float64) (Result, error) {
 	var deriv DerivativeApprox
 	switch nk.Stencil {

@@ -78,7 +78,9 @@ func NewFourPoint(F VecFunc, Eps float64) DerivativeApprox {
 // NewSixPoint returns a derivative approximator of using the central
 // six point differences.
 // Jv = (-F(x-3*eps*v) + 9*F(x-2*eps*v) - 45*F(x-eps*v)
-//      +45*F(x-eps*v) - 9*F(x+2*eps*v) + F(x+3*v))/(60*eps)
+//
+//	+45*F(x-eps*v) - 9*F(x+2*eps*v) + F(x+3*v))/(60*eps)
+//
 // where J is the jacobian
 func NewSixPoint(F VecFunc, Eps float64) DerivativeApprox {
 	return DerivativeApprox{
@@ -92,7 +94,9 @@ func NewSixPoint(F VecFunc, Eps float64) DerivativeApprox {
 // NewEightPoint returns a derivative approximator of using the central
 // eight point differences.
 // Jv = (-F(x-3*eps*v) + 9*F(x-2*eps*v) - 45*F(x-eps*v)
-//      +45*F(x-eps*v) - 9*F(x+2*eps*v) + F(x+3*v))/(60*eps)
+//
+//	+45*F(x-eps*v) - 9*F(x+2*eps*v) + F(x+3*v))/(60*eps)
+//
 // where J is the jacobian
 func NewEightPoint(F VecFunc, Eps float64) DerivativeApprox {
 	return DerivativeApprox{

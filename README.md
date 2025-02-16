@@ -1,6 +1,7 @@
 <img src="assets/logo.svg" width=50%/>
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/davidkleiven/gononlin.svg)](https://pkg.go.dev/github.com/davidkleiven/gononlin)
+[![Go Report Card](https://goreportcard.com/badge/github.com/davidkleiven/gononlin)](https://goreportcard.com/report/github.com/davidkleiven/gononlin)
 
 Package for solving non-linear systems of equations. The package implements Jacobian-Free Newton
 Krylov method, where the Jacobian is approximated via finite differences. However, since the Krylov space methods only require the action of the Jacboian on a search direction *v*, the full

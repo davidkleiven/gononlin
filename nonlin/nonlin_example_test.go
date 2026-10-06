@@ -3,12 +3,13 @@ package nonlin_test
 import (
 	"fmt"
 	"math"
-	"testing"
+
+	"log"
 
 	"github.com/davidkleiven/gononlin/nonlin"
 )
 
-func ExampleNewtonKrylov(t *testing.T) {
+func ExampleNewtonKrylov() {
 	// This example shows how one can use NewtonKrylov to solve the
 	// system of equations
 	// (x-1)^2*(x - y) = 0
@@ -25,7 +26,7 @@ func ExampleNewtonKrylov(t *testing.T) {
 		// Maximum number of Newton iterations
 		Maxiter: 1000,
 
-		// Stepsize used to appriximate jacobian with finite differences
+		// Stepsize used to approximate jacobian with finite differences
 		StepSize: 1e-2,
 
 		// Tolerance for the solution
@@ -35,7 +36,7 @@ func ExampleNewtonKrylov(t *testing.T) {
 	x0 := []float64{0.0, 3.0}
 	res, err := solver.Solve(problem, x0)
 	if err != nil {
-		t.Error(err)
+		log.Fatalf("Failed to solve problem: %v", err)
 	}
 	fmt.Printf("Root: (x, y) = (%.2f, %.2f)\n", res.X[0], res.X[1])
 	fmt.Printf("Function value: (%.2f, %.2f)\n", res.F[0], res.F[1])
